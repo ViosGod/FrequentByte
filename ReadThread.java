@@ -1,5 +1,5 @@
-import java.util.*
-import java.io.*
+import java.util.*;
+import java.io.*;
 
 public class ReadThread extends Thread {
 	private String fileName;
@@ -13,16 +13,29 @@ public class ReadThread extends Thread {
 			Map<Integer, Long> bytes = new HashMap<>();
 			while (fileInputStream.available()>0) {
 				int aByte = fileInputStream.read();
-				if (!bytes.containtsKey(aByte))
+				if (!bytes.containsKey(aByte))
 					bytes.put(aByte, 1L);
 				else
 					bytes.put(aByte, bytes.get(aByte)+1);
+			}
 				int maxByte=0;
 				long maxCount=0;
-				for(Map.Entry<Integer, Long>pair:bytes.entrySet()) {
-					
+				for(Map.Entry<Integer, Long>pair : bytes.entrySet()) {
+					int aByte = pair.getKey();
+					long count = pair.getValue();
+					if (count>maxCount) {
+					maxCount=count;
+					maxByte=aByte;
+					}
+
 				}
-			}					
+
+				
+			synchronized(this) {
+				FrequentByteFinderTester.resultMap.put(this.fileName, maxByte);
+			}				
+		} catch(IOException e) {
+			e.printStackTrace();
 		}
 	}
-}
+	}
